@@ -2,7 +2,7 @@
 
 <div class="container p-5 border border-dark">
     <h1>Alien Clock</h1>
-    
+
     <!-- Displaying Earth Time -->
     <div class="row">
         <div class="col-md-6">
@@ -21,30 +21,36 @@
     </div>
 
     <!-- Form to Set Alien Time -->
-    <form asp-action="SetAlienTime" method="post" class="mt-4">
+  @*   <form asp-action="SetAlienTime" method="post" class="mt-4">
         <h3>Set Alien Time</h3>
         <div class="row">
             <div class="col-md-2">
-                <input type="number" name="Year" placeholder="Year" class="form-control" min="2804" value="@Model.AlienTime.Year" required />
+                <input type="number" name="Year" id="yearInput" placeholder="Year" class="form-control" min="2804" value="@Model.AlienTime.Year" required />
             </div>
             <div class="col-md-2">
-                <input type="number" name="Month" placeholder="Month" class="form-control" value="@Model.AlienTime.Month" min="1" max="18" required />
+                <input type="number" name="Month" id="monthInput" placeholder="Month" class="form-control" value="@Model.AlienTime.Month" min="1" max="18" required />
             </div>
             <div class="col-md-2">
-                <input type="number" name="Day" placeholder="Day" class="form-control" value="@Model.AlienTime.Day" min="1" max="48" required />
+                <input type="number" name="Day" id="dayInput" placeholder="Day" class="form-control" value="@Model.AlienTime.Day" min="1" max="48" required />
             </div>
             <div class="col-md-2">
-                <input type="number" name="Hour" placeholder="Hour" class="form-control" value="@Model.AlienTime.Hour" min="0" max="35" required />
+                <input type="number" name="Hour" id="hourInput" placeholder="Hour" class="form-control" value="@Model.AlienTime.Hour" min="0" max="35" required />
             </div>
             <div class="col-md-2">
-                <input type="number" name="Minute" placeholder="Minute" class="form-control" value="@Model.AlienTime.Minute" min="0" max="89" required />
+                <input type="number" name="Minute" id="minuteInput" placeholder="Minute" class="form-control" value="@Model.AlienTime.Minute" min="0" max="89" required />
             </div>
             <div class="col-md-2">
-                <input type="number" name="Second" placeholder="Second" class="form-control" value="@Model.AlienTime.Second" min="0" max="89" required />
+                <input type="number" name="Second" id="secondInput" placeholder="Second" class="form-control" value="@Model.AlienTime.Second" min="0" max="89" required />
             </div>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Set Time</button>
+    </form> *@
+    <form asp-action="SetEarthTime" method="post" class="mt-4">
+        <h3>Set Earth Time</h3>
+        <input type="datetime-local" name="EarthTime" class="form-control" required />
+        <button type="submit" class="btn btn-primary mt-3">Set Earth Time</button>
     </form>
+
 
     <!-- Form to Set Alarm -->
     <h3 class="mt-4">Set Alarm</h3>
@@ -108,37 +114,3 @@
         <button type="submit" class="btn btn-primary mt-3">Convert Time</button>
     </form>
 </div>
-
-<!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // Function to update the Alien clock by fetching the time from the backend every 0.5 seconds
-    function updateAlienClock() {
-        $.get('/Time/GetCurrentAlienTime', function(alienTime) {
-            $('#alien-time-display').html(
-                `Year: ${alienTime.year}, Month: ${alienTime.month}, Day: ${alienTime.day} <br /> 
-                 ${alienTime.hour}:${alienTime.minute}:${alienTime.second}`
-            );
-        }).fail(function() {
-            console.error('Error fetching Alien time.');
-        });
-    }
-
-    // Set interval to update the Alien time every 0.5 seconds
-    setInterval(updateAlienClock, 500);
-    
-    // Handle the alarm form submission
-    $('#alarm-form').submit(function(e) {
-        e.preventDefault();
-        const alarmTimeInput = $('#alarmTime').val();
-        
-        // Check the alarm every second
-        const alarmCheckInterval = setInterval(function() {
-            const currentTime = new Date().toTimeString().split(' ')[0]; // Get current Earth time (HH:MM:SS)
-            if (currentTime === alarmTimeInput) {
-                $('#alarm-message').show();
-                clearInterval(alarmCheckInterval); // Stop checking once alarm goes off
-            }
-        }, 1000); // Check every second
-    });
-</script>
