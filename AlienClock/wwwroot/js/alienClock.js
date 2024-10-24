@@ -1,212 +1,74 @@
 ﻿$(document).ready(function () {
-    let alarms = []; // Array to store alarm times
-    let alarmCheckInterval; // Variable for checking alarms
+    let alarms = [];
+    let alarmCheckInterval;
+    let alienTime = modelData.alienTime; // Initial alien time from modelData
 
-    // Function to update the clocks by fetching the time from the backend every 0.5 seconds
-    setInterval(updateClocks, 500);
+    // Update Alien clock display like a digital clock
+    startAlienClock(alienTime); // Start the clock with the initial alien time
 
-    $('#setEarthTime').submit(function (e) {
-        e.preventDefault();
 
-        const earthTimeInput = $('input[name="EarthTime"]').val();
-        const parsedDate = new Date(earthTimeInput);
+    
 
-        // Validate Earth time input format
-        if (isNaN(parsedDate.getTime())) {
-            console.error('Invalid Earth time input');
-            return;
-        }
+    // Set the default date to January 1st, 2028
+    const defaultYear = alienTime.year;
+    const defaultMonth = alienTime.month - 1;
+    const defaultDay = alienTime.day;
+    const defaultHour = alienTime.hour + 1;
+    const defaultMinute = alienTime.minute + 1;
+    const defaultDate = new Date(defaultYear, defaultMonth, defaultDay, defaultHour, defaultMinute); // January 1st
 
-        // Send the new Earth time to the backend
-        $.ajax({
-            url: '/Time/SetEarthTime',
-            type: 'POST',
-            data: { earthTime: parsedDate.toISOString() }, // Ensure ISO string format for the DateTime
-            success: function (response) {
-                // Update alien time display
-                $('#alien-time-display').html(
-                    `<span class="time-part">${response.alienTime.day} - ${response.alienTime.month} - ${response.alienTime.year}</span><br />
-                    <span class="time-part">${response.alienTime.hour} : ${String(response.alienTime.minute).padStart(2, '0')} : ${String(response.alienTime.second).padStart(2, '0')}</span>`
-                );
+    // Format the date to the required input format (YYYY-MM-DDTHH:MM)
+    const formattedDate = defaultDate.toISOString().slice(0, 16);
 
-                // Store the new Earth time in sessionStorage
-                const newEarthTime = {
-                    day: response.earthTime.day,
-                    month: response.earthTime.month,
-                    year: response.earthTime.year,
-                    hour: response.earthTime.hour,
-                    minute: response.earthTime.minute,
-                    second: response.earthTime.second
-                };
-
-                // Store the new Earth time in the hidden input
-                $('#newEarthTime').val(JSON.stringify(newEarthTime));
-
-                console.log('Earth time successfully set and Alien time updated.');
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.error('Error setting Earth time:', textStatus, errorThrown);
-                console.error('Response:', jqXHR.responseText);
-                alert('Failed to set Earth time. Please try again.'); // User feedback
-            }
-        });
-    });
-
-    $('#alarm-form').submit(function (e) {
-        e.preventDefault();
-        const alarmTimeInput = $('#alarmTime').val();
-
-        // Validate alarm input
-        if (!alarmTimeInput) {
-            console.error('Invalid alarm time input');
-            return;
-        }
-
-        // Clear the alarms array before adding the new alarm
-        alarms.length = 0; // Clear the array
-
-        // Add the new alarm to the alarms array
-        alarms.push(alarmTimeInput);
-
-        // Store alarms in hidden input
-        $('#alarms').val(JSON.stringify(alarms));
-
-        // Clear any previous alarm check interval
-        clearInterval(alarmCheckInterval);
-
-        // Start checking alarms every second
-        alarmCheckInterval = setInterval(checkAlarms, 1000); // Check every second
-        // Display SweetAlert2 notification
-        Swal.fire({
-            title: 'Alarm Set!',
-            text: 'Alarm was set for ' + alarmTimeInput,
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
-    });
-    function checkAlarms() {
-        $.get('/Time/GetCurrentEarthTime', function (earthTime) {
-            const currentTime = `${String(earthTime.hour).padStart(2, '0')}:${String(earthTime.minute).padStart(2, '0')}`;
-
-            // Check if current time matches any alarm time
-            if (alarms.includes(currentTime)) {
-                // Play the alarm sound
-                const alarmSound = document.getElementById('alarm-sound');
-                alarmSound.play(); // Play the sound
-
-                Swal.fire({
-                    title: 'Alarm!',
-                    text: 'The time is now ' + currentTime,
-                    icon: 'info',
-                    confirmButtonText: 'OK'
-                });
-
-                clearInterval(alarmCheckInterval); // Stop checking once alarm goes off
-            }
-        }).fail(function () {
-            console.error('Error fetching Earth time for alarm check.');
-        });
-    }
-
+    // Set the input's value
+    document.getElementById('alienTimeSet').value = formattedDate;
 
 });
 
-function updateClocks() {
-    updateEarthClock(); // Update Earth clock
-    generateAlienClockFromStoredTime(); // Update Alien clock based on stored Earth time
+function startAlienClock(initialAlienTime) {
+    let alienTime = { ...initialAlienTime }; // Clone the initial alien time
+
+    // Update the display every alien second (e.g., 1000ms here assumes 1 Earth second equals 1 Alien second)
+    setInterval(function () {
+        incrementAlienTime(alienTime); // Increment the alien time by one "alien second"
+        updateAlienTimeDisplay(alienTime); // Update the displayed alien time
+    }, 1000); // You can adjust the interval here based on how fast alien seconds should pass
 }
 
-function updateEarthClock() {
-    $.get('/Time/GetCurrentEarthTime', function (earthTime) {
-        const earthTimeString = JSON.stringify(earthTime);
-        sessionStorage.setItem('EarthTime', earthTimeString); // Use sessionStorage here
+function incrementAlienTime(alienTime) {
+    // Increment the alien seconds
+    alienTime.second += 1;
 
-        $('#earth-time-display').html(
-            `<span class="time-part">${earthTime.day} - ${earthTime.month} - ${earthTime.year}</span><br />
-             <span class="time-part">${earthTime.hour} : ${String(earthTime.minute).padStart(2, '0')} : ${String(earthTime.second).padStart(2, '0')}</span>`
-        );
-    }).fail(function () {
-        console.error('Error fetching Earth time.');
-    });
-}
+    // Handle rollover for seconds, minutes, hours, and days based on alien time format
+    if (alienTime.second >= 90) {
+        alienTime.second = 0;
+        alienTime.minute += 1;
+    }
+    if (alienTime.minute >= 90) {
+        alienTime.minute = 0;
+        alienTime.hour += 1;
+    }
+    if (alienTime.hour >= 36) {
+        alienTime.hour = 0;
+        alienTime.day += 1;
+    }
 
-function generateAlienClockFromStoredTime() {
-    const earthTimeString = $('#newEarthTime').val(); // Get Earth time from hidden input
-
-    if (earthTimeString) {
-        const earthTime = JSON.parse(earthTimeString); // Parse the JSON string from the hidden input
-        updateAlienTimeDisplay(earthTime); // Update alien time display
-    } else {
-        // If no time in hidden input, fetch current Earth time
-        $.get('/Time/GetCurrentEarthTime', function (earthTime) {
-            updateAlienTimeDisplay(earthTime); // Update alien time display with fetched time
-        }).fail(function () {
-            console.error('Error fetching current Earth time.');
-        });
+    // Handle months and years if days overflow (assuming 44 days per month, adjust as needed)
+    const daysInMonths = [44, 42, 48, 40, 48, 44, 40, 44, 42, 40, 40, 42, 44, 48, 42, 40, 44, 38];
+    if (alienTime.day > daysInMonths[alienTime.month - 1]) {
+        alienTime.day = 1; // Reset the day to 1 when the month changes
+        alienTime.month += 1;
+    }
+    if (alienTime.month > 18) {
+        alienTime.month = 1; // Reset to the first month if the year changes
+        alienTime.year += 1;
     }
 }
-function updateAlienTimeDisplay(earthTime) {
-    const alienTime = calculateAlienTime(earthTime); // Calculate the alien time based on the Earth time
 
+function updateAlienTimeDisplay(alienTime) {
     $('#alien-time-display').html(
         `<span class="time-part">${alienTime.day} - ${alienTime.month} - ${alienTime.year}</span><br />
-         <span class="time-part">${alienTime.hour} : ${String(alienTime.minute).padStart(2, '0')} : ${String(alienTime.second).padStart(2, '0')}</span>`
+         <span class="time-part">${String(alienTime.hour).padStart(2, '0')} : ${String(alienTime.minute).padStart(2, '0')} : ${String(alienTime.second).padStart(2, '0')}</span>`
     );
 }
 
-function calculateAlienTime(earthTime) {
-    // Reference: Earth time at 1970-01-01, 12:00:00 AM
-    const referenceEarthDate = new Date(1970, 0, 1, 0, 0, 0);
-    const referenceAlienTime = {
-        year: 2804,
-        month: 18,
-        day: 31,
-        hour: 2,
-        minute: 2,
-        second: 88
-    };
-
-    // Calculate the difference in seconds between the given Earth time and the reference time
-    const currentEarthDate = new Date(earthTime.year, earthTime.month - 1, earthTime.day, earthTime.hour, earthTime.minute, earthTime.second);
-    const timeDifferenceInSeconds = (currentEarthDate - referenceEarthDate) / 1000; // Difference in seconds
-
-    // Convert time difference from Earth seconds to Alien seconds
-    const alienTimeDifferenceInSeconds = timeDifferenceInSeconds * 2; // 1 Earth second = 2 Alien seconds
-
-    // Calculate total Alien time from the reference
-    let totalAlienSeconds = referenceAlienTime.second + alienTimeDifferenceInSeconds;
-
-    // Convert Alien seconds to Alien time
-    let alienSecond = totalAlienSeconds % 90; // 90 seconds in a minute
-    let totalMinutes = Math.floor(totalAlienSeconds / 90);
-    let alienMinute = totalMinutes % 90; // 90 minutes in an hour
-    let totalHours = Math.floor(totalMinutes / 90);
-    let alienHour = totalHours % 36; // 36 hours in a day
-    let totalDays = Math.floor(totalHours / 36);
-
-    // Calculate Alien days and wrap around months
-    let alienDay = (referenceAlienTime.day + totalDays - 1) % 44 + 1; // Days wrap-around calculation
-    let alienMonth = referenceAlienTime.month + Math.floor((referenceAlienTime.day + totalDays - 1) / 44); // Month calculation
-    let alienYear = referenceAlienTime.year;
-
-    // Adjust month and year based on days and months
-    while (alienMonth > 18) {
-        alienMonth -= 18; // Wrap around to the first month
-        alienYear += 1;   // Increment the year
-    }
-
-    // Adjust the day based on the number of days in the calculated month
-    const daysInMonths = [44, 42, 48, 40, 48, 44, 40, 44, 42, 40, 40, 42, 44, 48, 42, 40, 44, 38];
-    if (alienDay > daysInMonths[alienMonth - 1]) {
-        alienDay = 1; // Reset day to 1 if it exceeds the max days of the month
-    }
-
-    return {
-        year: alienYear,
-        month: alienMonth,
-        day: alienDay,
-        hour: alienHour,
-        minute: alienMinute,
-        second: alienSecond
-    };
-}

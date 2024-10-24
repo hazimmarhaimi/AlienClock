@@ -6,37 +6,37 @@
 
     <!-- Displaying Earth Time -->
     <div class="row">
-        <div class="col-md-6">
-            <h2>Earth Time</h2>
-            <div id="earth-time-display" class="time-display">
-                <!-- Earth time will be dynamically updated here -->
-            </div>
-
-        </div>
-
         <!-- Displaying Alien Time -->
         <div class="col-md-6">
             <h2>Alien Time</h2>
             <div id="alien-time-display">
-@*                 <p>Year: @Model.AlienTime.Year, Month: @Model.AlienTime.Month, Day: @Model.AlienTime.Day</p>
-                <p>@Model.AlienTime.Hour:@Model.AlienTime.Minute:@Model.AlienTime.Second</p>
- *@            </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h2>Earth Time</h2>
+            <div id="earth-time-display" class="time-display">
+            </div>
+
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <form id="setEarthTime" method="post" class="mt-4">
-                <h3>Set Earth Time</h3>
-                <input type="datetime-local" name="EarthTime" class="form-control" required />
-                <button type="submit" class="button-alien mt-3">Set Earth Time</button>
+            <form id="setAlienTime" method="post" class="mt-4">
+                <h3>Set Alien Time</h3>
+                <input type="datetime-local"
+                id="alienTimeSet"
+                       name="AlienTime"
+                       class="form-control" required />
+                <button type="submit" class="button-alien mt-3">Set Alien Time</button>
             </form>
         </div>
-        <input type="hidden" id="newEarthTime" name="newEarthTime">
+
+        <input type="hidden" id="newAlienTime" name="newAlienTime">
         <div class="col-md-6">
             <!-- Form to Set Alarm -->
 
-            <h3 class="mt-4">Set Alarm</h3>
+            <h3 class="mt-4">Set Alarm for Alien Time</h3>
             <form id="alarm-form">
                 <input type="time" name="alarmTime" id="alarmTime" class="form-control" required />
                 <button type="submit" class="button-alien mt-2">Set Alarm</button>
@@ -57,3 +57,11 @@
     </div>
     <audio id="alarm-sound" src="~/assets/audio/mixkit-digital-clock-digital-alarm.wav" preload="auto"></audio>
 </div>
+
+<script>
+    
+    var modelData = @Html.Raw(Json.Serialize(Model));
+
+    console.log(modelData);
+</script>
+<script src="~/js/alienClock.js"></script>
