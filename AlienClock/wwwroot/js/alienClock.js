@@ -242,7 +242,7 @@ function updateAlienTimeDisplay(alienTime) {
 
 
 function updateEarthTimeDisplay(alienTime) {
-    // Create a FormData object to send alienTime data
+    
     const formData = new FormData();
     formData.append('year', alienTime.year);
     formData.append('month', alienTime.month);
@@ -251,20 +251,18 @@ function updateEarthTimeDisplay(alienTime) {
     formData.append('minute', alienTime.minute);
     formData.append('second', alienTime.second);
 
-    // Make AJAX call to send alien time to the controller
+    
     $.ajax({
-        url: '/Time/ConvertAlienToEarth', // Replace with the correct path to your controller method
+        url: '/Time/ConvertAlienToEarth',
         type: 'POST',
-        processData: false, // Don't process the data (required for FormData)
-        contentType: false, // Prevent jQuery from overriding the content type
-        data: formData, // Send the FormData object
+        processData: false, 
+        contentType: false,
+        data: formData, 
         success: function (response)
         {
-            console.log("testtest",response);
-            // Assuming the response contains the converted Earth time in a JSON object
-            //const earthTime = new Date(response.year, response.month - 1, response.day, response.hour, response.minute, response.second);
 
             const dateObject = new Date(response.earthTime);
+            console.log("dateEarth:", dateObject);
             // Extract date components
             const year = dateObject.getFullYear(); // Get full year
             const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // Month (0-11, so +1)
@@ -289,19 +287,19 @@ function updateEarthTimeDisplay(alienTime) {
         }
     });
 }
-// Assuming you have the alienTime object available with the current Alien time
+
 function checkAlarm() {
     // Get the current Alien time from hidden inputs
-    const currentAlienHour = parseInt($('#current-alien-hour').val()); // Retrieve and parse the hour from hidden input
-    const currentAlienMinute = parseInt($('#current-alien-minute').val()); // Retrieve and parse the minute from hidden input
+    const currentAlienHour = parseInt($('#current-alien-hour').val()); 
+    const currentAlienMinute = parseInt($('#current-alien-minute').val());
 
     // Get the alarm values from the hidden inputs
-    const alarmHour = parseInt($('#alarms-hour').val()); // Retrieve and parse the alarm hour
-    const alarmMinute = parseInt($('#alarms-minute').val()); // Retrieve and parse the alarm minute
+    const alarmHour = parseInt($('#alarms-hour').val()); 
+    const alarmMinute = parseInt($('#alarms-minute').val());
 
     // Check if current Alien time matches the alarm time
     if (currentAlienHour === alarmHour && currentAlienMinute === alarmMinute) {
-        // Trigger SweetAlert
+        
         Swal.fire({
             icon: 'info',
             title: 'Time is Reached!!',

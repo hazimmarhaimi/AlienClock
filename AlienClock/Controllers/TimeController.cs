@@ -16,18 +16,15 @@ namespace AlienClock.Controllers
             _currentEarthTime = DateTime.Now;
         }
 
-        // This renders the initial view with both Earth and Alien time
         public IActionResult Index()
         {
-            // Use the current Earth time if it has been set; otherwise, use DateTime.Now
-            DateTime earthTime = _currentEarthTime != DateTime.MinValue ? _currentEarthTime : DateTime.Now;
 
-            // Convert Earth time to Alien time using your service
+            // Convert Earth time to Alien time initial
             AlienTimeViewModel alienTime = _timeService.ConvertEarthToAlien();
 
             var model = new TimeViewModel
             {
-                EarthTime = earthTime,
+                EarthTime = _currentEarthTime,
                 AlienTime = alienTime
             };
 
@@ -38,11 +35,8 @@ namespace AlienClock.Controllers
         [HttpGet]
         public IActionResult GetCurrentEarthTime()
         {
-            // Retrieve the Earth time from session as a string
-           
             DateTime earthTime = DateTime.Now;
 
-            // Return the current Earth time as JSON
             return Json(new
             {
                 year = earthTime.Year,
@@ -66,7 +60,6 @@ namespace AlienClock.Controllers
                 EarthTime = earthTime
             };
 
-            // Return the model data as JSON
             return Json(model);
         }
 

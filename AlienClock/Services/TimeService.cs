@@ -23,8 +23,6 @@ namespace AlienClock.Services
 
             return GetAlienTimeNow(alienSecondNow);
         }
-
-
         public DateTime GetEarthTimeBasedOnAlienTime(AlienTimeViewModel alienTime)
         {
             // Constants for conversion
@@ -67,9 +65,6 @@ namespace AlienClock.Services
 
             return earthDateTime;
         }
-
-
-
         public long GetAlienSecondsNow()
         {
             long secondsNow = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
@@ -77,7 +72,6 @@ namespace AlienClock.Services
 
             return alienSecondsNow;
         }
-
         public AlienTimeViewModel GetAlienTimeNow(long alienSecondsNow)
         {
             var minutesRemainder = (long)(alienSecondsNow / alienSecondsToMinute);
@@ -135,9 +129,6 @@ namespace AlienClock.Services
 
             return alienTimeViewModel;
         }
-
-
-
         public int GetDaysInMonth(int month)
         {
             switch (month)

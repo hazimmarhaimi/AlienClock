@@ -2,8 +2,8 @@
 {
     public class TimeViewModel
     {
-        public DateTime EarthTime { get; set; }   // Holds the current Earth time
-        public AlienTimeViewModel AlienTime { get; set; }   // Holds the current Alien time
+        public DateTime EarthTime { get; set; }
+        public AlienTimeViewModel AlienTime { get; set; } 
     }
 
     public class AlienTimeViewModel
@@ -18,7 +18,7 @@
 
     public class EarthTimeViewModel
     {
-        public AlienTimeViewModel AlienTime { get; set; } // Holds Alien time input
-        public DateTime EarthTime { get; set; }           // Holds corresponding Earth time
+        public AlienTimeViewModel AlienTime { get; set; } 
+        public DateTime EarthTime { get; set; }
     }
 }
