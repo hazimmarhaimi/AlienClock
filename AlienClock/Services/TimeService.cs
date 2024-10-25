@@ -17,11 +17,6 @@ namespace AlienClock.Services
         public static int alienDaysToMonth = 770;
         public static int alienMonthsToYear = 18;
 
-        private static readonly DateTime EarthBaseTime = new DateTime(1970, 1, 1, 0, 0, 0);
-        private static readonly AlienTimeViewModel AlienBaseTime = new AlienTimeViewModel { Year = 2804, Month = 18, Day = 31, Hour = 2, Minute = 2, Second = 88 };
-
-        private static readonly int[] DaysInMonth = { 44, 42, 48, 40, 48, 44, 40, 44, 42, 40, 40, 42, 44, 48, 42, 40, 44, 38 };
-
         public AlienTimeViewModel ConvertEarthToAlien()
         {
             long alienSecondNow = GetAlienSecondsNow();
@@ -29,71 +24,50 @@ namespace AlienClock.Services
             return GetAlienTimeNow(alienSecondNow);
         }
 
-        public double ConvertDateToSeconds(DateTime targetDate)
+
+        public DateTime GetEarthTimeBasedOnAlienTime(AlienTimeViewModel alienTime)
         {
-            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            TimeSpan timeDifference = targetDate - epoch;
-            return timeDifference.TotalSeconds;
-        }
+            // Constants for conversion
+            const int alienSecondsToMinute = 90;
+            const int alienMinutesToHour = 36;
+            const int alienHoursToDay = 36;
 
-        public DateTime ConvertAlienToEarth(AlienTimeViewModel alienTime)
-        {
-            // Calculate total Alien seconds
-            double totalAlienSeconds = CalculateTotalAlienSeconds(alienTime);
+            // Start with the alien Unix epoch values as a base for calculations
+            int totalDays = 0;
 
-            // Convert Alien seconds to Earth seconds
-            double earthSeconds = totalAlienSeconds / 2; // Ensure correct conversion rate
-
-            DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-            // Add the seconds to the epoch
-            DateTime newDate = unixEpoch.AddSeconds(earthSeconds);
-            // Convert to Earth DateTime
-            return newDate;
-        }
-
-
-        private double CalculateTotalAlienSeconds(AlienTimeViewModel alienTime)
-        {
-            double totalAlienSeconds = 0;
-
-            // Constants for your Alien calendar
-            const int secondsPerMinute = 90;
-            const int secondsPerHour = 36 * secondsPerMinute;
-            const int secondsPerDay = 36 * secondsPerHour;
-
-            const int oneMin = 90; // 90sec
-            const int oneHour = 90; // 90min
-            const int oneDay = 36; // 36Hours
-            const int oneYear = 770; // 770days
-
-            // Get the total alien seconds in the base year (i.e., 0 year offset)
-            totalAlienSeconds += (alienTime.Year -1) * GetTotalSecondsInOneAlienYear();
-
-            // Total seconds from months
-            for (int i = 0; i < alienTime.Month - 1; i++)
+            // Calculate days for the difference in years
+            for (int year = alienUnixYear; year < alienTime.Year; year++)
             {
-                totalAlienSeconds += DaysInMonth[i] * secondsPerDay;
+                for (int month = 1; month <= alienMonthsToYear; month++)
+                {
+                    totalDays += GetDaysInMonth(month);
+                }
             }
 
-            // Total seconds from days
-            totalAlienSeconds += (alienTime.Day - 1) * secondsPerDay;
+            // Add days for the difference in months
+            for (int month = 1; month < alienTime.Month; month++)
+            {
+                totalDays += GetDaysInMonth(month);
+            }
 
-            // Total seconds from hours, minutes, and seconds
-            totalAlienSeconds += alienTime.Hour * secondsPerHour;
-            totalAlienSeconds += alienTime.Minute * secondsPerMinute;
+            // Add the days in the current month
+            totalDays += alienTime.Day - alienUnixDay;
+
+            // Calculate the total Alien seconds from days, hours, minutes, and seconds
+            long totalAlienSeconds = totalDays * alienHoursToDay * alienMinutesToHour * alienSecondsToMinute;
+            totalAlienSeconds += alienTime.Hour * alienMinutesToHour * alienSecondsToMinute;
+            totalAlienSeconds += alienTime.Minute * alienSecondsToMinute;
             totalAlienSeconds += alienTime.Second;
 
-            // Return total alien seconds converted to Earth seconds
-            return totalAlienSeconds; // Assuming 1 Earth second = 2 Alien seconds.
+            // Convert Alien seconds to Earth seconds (assuming 1 Alien second = 0.5 Earth seconds)
+            long earthSeconds = totalAlienSeconds / 2;
+
+            // Calculate the Earth DateTime based on Unix epoch
+            DateTime earthDateTime = DateTimeOffset.FromUnixTimeSeconds(earthSeconds).UtcDateTime;
+
+            return earthDateTime;
         }
 
-        private int GetTotalSecondsInOneAlienYear()
-        {
-            // Sum up all days across each month in the Alien calendar
-            int totalDaysInYear = DaysInMonth.Sum();
-            return totalDaysInYear * 36 * 90 * 90; // 36 hours/day, 90 minutes/hour, 90 seconds/minute
-        }
 
 
         public long GetAlienSecondsNow()
@@ -162,6 +136,8 @@ namespace AlienClock.Services
             return alienTimeViewModel;
         }
 
+
+
         public int GetDaysInMonth(int month)
         {
             switch (month)
@@ -187,5 +163,6 @@ namespace AlienClock.Services
                 default: throw new NotImplementedException();
             }
         }
+
     }
 }

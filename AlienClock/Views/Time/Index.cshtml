@@ -13,15 +13,6 @@
             </div>
         </div>
         <div class="col-md-6">
-            <h2>Earth Time</h2>
-            <div id="earth-time-display" class="time-display">
-            </div>
-
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
             <form id="setAlienTime" method="post" class="mt-4">
                 <h3>Set Alien Time</h3>
 
@@ -29,7 +20,7 @@
                     <!-- Row 1: Year and Month -->
                     <div class="form-group">
                         <label for="alienYear">Year:</label>
-                        <input type="number" id="alienYear" name="AlienYear" class="form-control" required />
+                        <select id="alienYear" name="AlienYear" class="form-control" required></select>
                     </div>
 
                     <div class="form-group">
@@ -51,7 +42,7 @@
 
                     <div class="form-group">
                         <label for="alienHour">Hour:</label>
-                        <input type="number" id="alienHour" name="AlienHour" class="form-control" min="0" max="35" required />
+                        <select id="alienHour" name="AlienHour" class="form-control" required></select>
                     </div>
                 </div>
 
@@ -59,12 +50,12 @@
                     <!-- Row 3: Minute and Second -->
                     <div class="form-group">
                         <label for="alienMinute">Minute:</label>
-                        <input type="number" id="alienMinute" name="AlienMinute" class="form-control" min="0" max="89" required />
+                        <select id="alienMinute" name="AlienMinute" class="form-control" required></select>
                     </div>
 
                     <div class="form-group">
                         <label for="alienSecond">Second:</label>
-                        <input type="number" id="alienSecond" name="AlienSecond" class="form-control" min="0" max="89" required />
+                        <select id="alienSecond" name="AlienSecond" class="form-control" required></select>
                     </div>
                 </div>
 
@@ -72,37 +63,26 @@
             </form>
 
         </div>
-
-
-
-        <input type="hidden" id="newAlienTime" name="newAlienTime">
-        <div class="col-md-6">
-            <!-- Form to Set Alarm -->
-
-            <h3 class="mt-4">Set Alarm for Alien Time</h3>
-            <form id="alarm-form">
-                <input type="time" name="alarmTime" id="alarmTime" class="form-control" required />
-                <button type="submit" class="button-alien mt-2">Set Alarm</button>
-            </form>
-        </div>
-    </div>
-    <input type="hidden" id="alarms" name="alarms">
-
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Alarm Message -->
-            <div id="alarm-message" class="mt-3" style="display:none;">
-                <div class="alert alert-success">
-                    <strong>Alarm!</strong> Your set alarm time has been reached!
-                </div>
+        <div class="earthPosition">
+            <h2>Earth Time</h2>
+            <div id="earth-time-display" class="time-display">
             </div>
+
+        </div>
+        <div class="alarm-position" id="alarmIcon">
+            <i class="bi bi-alarm float-end" ></i>
         </div>
     </div>
-    <audio id="alarm-sound" src="~/assets/audio/mixkit-digital-clock-digital-alarm.wav" preload="auto"></audio>
+    <input type="hidden" id="current-alien-hour" name="current-alien-hour">
+    <input type="hidden" id="current-alien-minute" name="current-alien-minute">
+    <input type="hidden" id="alarms-hour" name="alarms-hour">
+    <input type="hidden" id="alarms-minute" name="alarms-minute">
+    <audio id="alarmSound" src="~/assets/audio/mixkit-digital-clock-digital-alarm.wav" preload="auto"></audio>
+
 </div>
 
 <script>
-    
+
     var modelData = @Html.Raw(Json.Serialize(Model));
 
     console.log(modelData);

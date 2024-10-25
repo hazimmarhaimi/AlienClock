@@ -58,7 +58,7 @@ namespace AlienClock.Controllers
         [HttpPost]
         public IActionResult ConvertAlienToEarth(AlienTimeViewModel alienTime)
         {
-            DateTime earthTime = _timeService.ConvertAlienToEarth(alienTime);
+            DateTime earthTime = _timeService.GetEarthTimeBasedOnAlienTime(alienTime);
 
             var model = new EarthTimeViewModel
             {

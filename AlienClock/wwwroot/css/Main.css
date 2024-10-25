@@ -4,9 +4,29 @@
     font-style: normal;
 }
 
-h1, h2, h3, h4, label {
+h1, h2, h3, h4, label, .alarm-position {
     color: aqua;
 }
+
+.earthPosition {
+    position: absolute;
+    top: 22rem;
+    right: -2rem;
+}
+.alarm-position {
+    width: 2%;
+    position: absolute;
+    font-size: 4rem;
+    top: 1rem;
+    right: 0;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-right: 4rem;
+}
+.alarm-position:hover {
+    color: #318f8f; /* Color change on hover */
+}
+
 
 .glassbg {
     background: rgba(255, 255, 255, 0.12);
@@ -19,6 +39,9 @@ h1, h2, h3, h4, label {
 .time-part {
     font-size: 4rem; /* Set the font size to 30px for the time display */
     color: #daf6ff; /* Optional: You can set the color or any other styles you like */
+}
+#earth-time-display .time-part {
+    font-size: 1.5rem;
 }
 
 .button-alien {
